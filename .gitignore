@@ -1,6 +1,5 @@
 *.class
 db-hsql/
-target/
 *.iml
 *.iws
 *.ipr
