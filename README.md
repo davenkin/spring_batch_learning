@@ -1,7 +1,7 @@
 spring_batch_learning
 =====================
 
-(1) after clone the project, run "mvn package" to get all the things running, including fetch dependencies
+(1) after clone the project, run "mvn compile" to get all the things running, including fetch dependencies
 
 (2)under the project root folder, run startHsqlServer.sh to start the Hsql server, the server will create db
    under db-hsql foler which lies under the project root folder
