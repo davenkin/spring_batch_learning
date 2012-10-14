@@ -27,7 +27,7 @@
 
     <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
         <property name="driverClassName" value="org.hsqldb.jdbcDriver"/>
-        <property name="url" value="jdbc:hsqldb:mem:testdb"/>
+        <property name="url" value="jdbc:hsqldb:hsql://localhost/spring-batch-db"/>
         <property name="username" value="sa"/>
         <property name="password" value=""/>
     </bean>
@@ -36,8 +36,8 @@
         <property name="dataSource" ref="dataSource"/>
     </bean>
 
-    <jdbc:initialize-database data-source="dataSource">
-        <jdbc:script location="org/springframework/batch/core/schema-hsqldb.sql"/>
-    </jdbc:initialize-database>
+    <!--<jdbc:initialize-database data-source="dataSource">-->
+        <!--<jdbc:script location="org/springframework/batch/core/schema-hsqldb.sql"/>-->
+    <!--</jdbc:initialize-database>-->
 
 </beans>
