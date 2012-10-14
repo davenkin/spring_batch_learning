@@ -1,6 +1,5 @@
 package com.thoughtworks.davenkin.springbatch;
 
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.BatchStatus;
@@ -23,21 +22,18 @@ import static org.junit.Assert.assertEquals;
 @RunWith(SpringJUnit4ClassRunner.class)
 public class SimpleJobTest
 {
-    /** JobLauncherTestUtils Bean. */
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
 
     @Autowired
     private DataSource dataSource;
 
-    /** Launch Test. */
     @Test
     public void launchJob() throws Exception {
-        // launch the job, the utils provide the job with a unique parameter
         JobExecution jobExecution = jobLauncherTestUtils.launchJob();
 
-        // assert job run status
         assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
+
         Connection connection = dataSource.getConnection();
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery("select * from BATCH_JOB_EXECUTION");

@@ -17,11 +17,6 @@
 
     <bean id="simpleTasklet" class="com.thoughtworks.davenkin.springbatch.SimpleTaskletStep"/>
 
-    <bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.MapJobRegistry"/>
-
-    <bean class="org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor"
-          p:jobRegistry-ref="jobRegistry"/>
-
     <bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher"
           p:jobRepository-ref="jobRepository"/>
 
