@@ -1,4 +1,5 @@
 *.class
+db-hsql/**/*
 target/**/*
 *.iml
 *.iws
