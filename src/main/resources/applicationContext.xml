@@ -22,6 +22,7 @@
     </bean>
 
     <bean id="itemWriter" class="com.thoughtworks.davenkin.springbatch.InventoryWriter">
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
     </bean>
 
 

@@ -14,4 +14,9 @@ public class Inventory
         this.withdraw = withdraw;
         this.timestamp = timestamp;
     }
+
+    public Object[] createPrepareStatementSetter()
+    {
+        return new Object[]{deposit, withdraw, deposit - withdraw, timestamp};
+    }
 }
