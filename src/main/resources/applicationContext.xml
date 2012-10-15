@@ -11,11 +11,24 @@
 
     <job id="simpleTaskletStepJob" xmlns="http://www.springframework.org/schema/batch">
         <step id="simpleTaskletStep">
-            <tasklet ref="simpleTasklet"/>
+            <tasklet>
+                <chunk reader="itemReader" writer="itemWriter" commit-interval="1"/>
+            </tasklet>
         </step>
     </job>
 
-    <bean id="simpleTasklet" class="com.thoughtworks.davenkin.springbatch.SimpleTaskletStep"/>
+    <bean id="itemReader" class="com.thoughtworks.davenkin.springbatch.InventoryReader">
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+    </bean>
+
+    <bean id="itemWriter" class="com.thoughtworks.davenkin.springbatch.InventoryWriter">
+    </bean>
+
+
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
 
     <bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher"
           p:jobRepository-ref="jobRepository"/>
@@ -37,7 +50,7 @@
     </bean>
 
     <!--<jdbc:initialize-database data-source="dataSource">-->
-        <!--<jdbc:script location="org/springframework/batch/core/schema-hsqldb.sql"/>-->
+    <!--<jdbc:script location="org/springframework/batch/core/schema-hsqldb.sql"/>-->
     <!--</jdbc:initialize-database>-->
 
 </beans>
