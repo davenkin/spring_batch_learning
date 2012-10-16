@@ -10,12 +10,29 @@
 
 
     <job id="simpleTaskletStepJob" xmlns="http://www.springframework.org/schema/batch">
-        <step id="simpleTaskletStep">
+        <step id="simpleTaskletStep" next="simplePrintStep">
             <tasklet>
                 <chunk reader="itemReader" writer="itemWriter" commit-interval="1"/>
             </tasklet>
         </step>
+        <step id="simplePrintStep">
+            <tasklet>
+                <chunk reader="printItemReader" writer="printItemWriter" commit-interval="3"/>
+            </tasklet>
+        </step>
+
     </job>
+
+    <bean id="printItemReader" class="org.springframework.batch.item.database.JdbcCursorItemReader">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="rowMapper">
+            <bean class="com.thoughtworks.davenkin.springbatch.PrintItemMapper"/>
+        </property>
+        <property name="sql">
+            <value>select * from deposit</value>
+        </property>
+    </bean>
+
 
     <bean id="itemReader" class="com.thoughtworks.davenkin.springbatch.InventoryReader">
         <property name="jdbcTemplate" ref="jdbcTemplate"/>
@@ -23,6 +40,9 @@
 
     <bean id="itemWriter" class="com.thoughtworks.davenkin.springbatch.InventoryWriter">
         <property name="jdbcTemplate" ref="jdbcTemplate"/>
+    </bean>
+
+    <bean id="printItemWriter" class="com.thoughtworks.davenkin.springbatch.PrintItemWriter">
     </bean>
 
 
