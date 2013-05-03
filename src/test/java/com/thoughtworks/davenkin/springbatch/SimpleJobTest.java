@@ -12,10 +12,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import javax.sql.DataSource;
 import java.util.HashMap;
 
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 @ContextConfiguration(locations = {
-        "classpath:applicationContext.xml",
+        "classpath:skipItemJobContext.xml",
         "classpath:testContext.xml"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class SimpleJobTest

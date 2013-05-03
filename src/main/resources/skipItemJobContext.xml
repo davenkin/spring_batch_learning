@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+       xmlns:batch="http://www.springframework.org/schema/batch"
+       xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.1.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-3.0.xsd">
+
+
+    <job id="simpleTaskletStepJob" xmlns="http://www.springframework.org/schema/batch">
+        <step id="simpleTaskletStep" next="countStep">
+            <tasklet>
+                <chunk reader="itemReader" writer="itemWriter" commit-interval="1" skip-limit="3000" >
+                    <batch:skippable-exception-classes>
+                        <batch:include class="org.springframework.batch.item.file.FlatFileParseException" />
+                        <batch:include class="com.thoughtworks.davenkin.springbatch.MyException" />
+                    </batch:skippable-exception-classes>
+                </chunk>
+            </tasklet>
+        </step>
+
+        <step id="countStep">
+            <tasklet ref="countTasklet"/>
+        </step>
+        <!--<step id="simplePrintStep">-->
+            <!--<tasklet>-->
+                <!--<chunk reader="printItemReader" writer="printItemWriter" commit-interval="3"/>-->
+            <!--</tasklet>-->
+        <!--</step>-->
+    </job>
+
+    <bean id="countTasklet" class="com.thoughtworks.davenkin.springbatch.CountTasklet"/>
+
+
+
+    <bean id="itemReader"
+          class="org.springframework.batch.item.file.FlatFileItemReader">
+        <property name="resource"
+                  value="classpath:test.csv"/>
+
+        <property name="lineMapper" ref="peopleLineMapper" />
+
+
+    </bean>
+
+    <bean id="peopleLineMapper" class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+        <property name="lineTokenizer">
+            <bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+                <property name="delimiter" value=","/>
+                <property name="names" value="id, name"/>
+            </bean>
+
+        </property>
+        <property name="fieldSetMapper">
+            <bean
+                    class="com.thoughtworks.davenkin.springbatch.PersonFieldSetMapper"/>
+        </property>
+    </bean>
+
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <bean id="itemWriter" class="com.thoughtworks.davenkin.springbatch.PersonWriter">
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+    </bean>
+    <!--<bean id="itemWriter" class="com.thoughtworks.davenkin.springbatch.PersonDelegateWriter">-->
+        <!--<property name="delegate" ref="itemWriter1"/>-->
+    <!--</bean>-->
+
+    <bean id="itemWriter1" class="org.springframework.batch.item.file.FlatFileItemWriter">
+        <property name="resource" value="out.csv"/>
+        <property name="shouldDeleteIfExists" value="true"/>
+        <property name="lineAggregator">
+            <bean class="org.springframework.batch.item.file.transform.DelimitedLineAggregator">
+                <property name="delimiter" value="-"/>
+                <property name="fieldExtractor">
+                    <bean class="org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor">
+                        <property name="names" value="id,name"/>
+                    </bean>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <!--<bean id="printItemReader" class="org.springframework.batch.item.database.JdbcCursorItemReader">-->
+        <!--<property name="dataSource" ref="dataSource"/>-->
+        <!--<property name="rowMapper">-->
+            <!--<bean class="com.thoughtworks.davenkin.springbatch.PrintItemMapper"/>-->
+        <!--</property>-->
+        <!--<property name="sql">-->
+            <!--<value>select * from deposit</value>-->
+        <!--</property>-->
+    <!--</bean>-->
+
+    <!--<bean id="printItemWriter" class="com.thoughtworks.davenkin.springbatch.PrintItemWriter">-->
+    <!--</bean>-->
+
+    <!--<jdbc:embedded-database id="dataSource">-->
+        <!--<jdbc:script location="classpath:org/springframework/batch/core/schema-hsqldb.sql"/>-->
+    <!--</jdbc:embedded-database>-->
+
+    <bean id="dataSource"
+          class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver" />
+        <property name="url" value="jdbc:mysql://localhost:3306/SKIP" />
+        <property name="username" value="root" />
+        <property name="password" value="" />
+    </bean>
+
+    <jdbc:initialize-database data-source="dataSource">
+    <jdbc:script location="person.sql"/>
+    <jdbc:script location="org/springframework/batch/core/schema-drop-mysql.sql"/>
+    <jdbc:script location="org/springframework/batch/core/schema-mysql.sql"/>
+    </jdbc:initialize-database>
+
+
+    <bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher"
+          p:jobRepository-ref="jobRepository"/>
+
+    <bean id="jobRepository" class="org.springframework.batch.core.repository.support.JobRepositoryFactoryBean"
+          p:dataSource-ref="dataSource"
+          p:transactionManager-ref="transactionManager"/>
+
+
+    <!--<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">-->
+        <!--<property name="driverClassName" value="org.hsqldb.jdbcDriver"/>-->
+        <!--<property name="url" value="jdbc:hsqldb:hsql://localhost/spring-batch-db"/>-->
+        <!--<property name="username" value="sa"/>-->
+        <!--<property name="password" value=""/>-->
+    <!--</bean>-->
+
+
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+</beans>
